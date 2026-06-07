@@ -1,0 +1,52 @@
+Step-by-step Derivation / Execution Trace for: (x AND y) OR NOT z
+
+1. call parse_expression()
+2.   call parse_term()
+3.     call parse_factor()
+4.       call parse_primary()
+5.         consume '('
+6.         call parse_expression()
+7.           call parse_term()
+8.             call parse_factor()
+9.               call parse_primary()
+10.                consume 'ID' (x)
+11.                return 'x'
+12.             parse_factor returns 'x'
+13.             Term loop sees 'AND', consumes 'AND'
+14.             call parse_factor()
+15.               call parse_primary()
+16.                 consume 'ID' (y)
+17.                 return 'y'
+18.             parse_factor returns 'y'
+19.             EMIT: t1 = x AND y
+20.             Term loop ends
+21.             return 't1'
+22.           parse_expression sees no OR/XOR loop
+23.           return 't1'
+24.         consume ')'
+25.         return 't1'
+26.       parse_factor returns 't1'
+27.     parse_term loop sees no AND
+28.     return 't1'
+29.   parse_expression loop sees 'OR', consumes 'OR'
+30.   call parse_term()
+31.     call parse_factor()
+32.       consume 'NOT'
+33.       call parse_factor()
+34.         call parse_primary()
+35.           consume 'ID' (z)
+36.           return 'z'
+37.         parse_factor returns 'z'
+38.       EMIT: t2 = NOT z
+39.       return 't2'
+40.     parse_term loop sees no AND
+41.     return 't2'
+42.   EMIT: t3 = t1 OR t2
+43.   parse_expression loop ends
+44.   return 't3'
+
+Final Generated TAC (including RESULT line):
+t1 = x AND y
+t2 = NOT z
+t3 = t1 OR t2
+RESULT = t3

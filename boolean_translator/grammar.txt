@@ -1,0 +1,46 @@
+Boolean Expressions Context-Free Grammar
+
+To handle the required precedence (NOT > AND > OR, XOR) and associativity (Left-associative for AND, OR, XOR; Right-associative or prefix for NOT), we use a factored Grammar that eliminates left-recursion and is compatible with a Top-Down Recursive Descent Parser.
+
+Non-terminals:
+  Expression : Represents the lowest precedence operations (OR, XOR).
+  Term       : Represents the medium precedence operation (AND).
+  Factor     : Represents the highest precedence operation (NOT) and basic units.
+  Primary    : Represents atomic expressions (Identifiers, Booleans, and Parenthesized Expressions).
+
+Terminals:
+  ID     : Identifier (e.g., a, b, var_x)
+  TRUE   : Boolean literal `true`
+  FALSE  : Boolean literal `false`
+  NOT    : Logical NOT operator
+  AND    : Logical AND operator
+  OR     : Logical OR operator
+  XOR    : Logical XOR operator
+  LPAREN : Left parenthesis `(`
+  RPAREN : Right parenthesis `)`
+
+Grammar Rules:
+
+Expression  -> Term Expression'
+Expression' -> OR Term Expression' 
+             | XOR Term Expression' 
+             | ε
+
+Term        -> Factor Term'
+Term'       -> AND Factor Term' 
+             | ε
+
+Factor      -> NOT Factor 
+             | Primary
+
+Primary     -> ID 
+             | TRUE 
+             | FALSE 
+             | LPAREN Expression RPAREN
+
+(Note: In the recursive descent implementation, the prime (') non-terminals which resolve left recursion are implemented using `while` loops).
+
+Notes on implementation details:
+- The tokenizer recognizes `NOT`, `AND`, `OR`, `XOR`, `TRUE`, `FALSE`, identifiers, and parentheses. Tokens are upper-cased by the lexer.
+- The parser exposes the functions `parse_expression()`, `parse_term()`, `parse_factor()`, and `parse_primary()` which implement the grammar above.
+- When generating Three-Address Code (TAC), boolean literals `TRUE`/`FALSE` are emitted as lowercase `true`/`false`, temporaries are named `t1`, `t2`, ..., and the final line is `RESULT = <expr>`.
